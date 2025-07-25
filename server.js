@@ -7,3 +7,6 @@ const port=3000;
 
 app.use(express.json())
 app.use(cors())
+
+app.get('/',(req,res)=>res.send('Server is Live'))
+app.listen(port,()=>console.log(`Server listing at http://localhost:${port}`));
