@@ -3,28 +3,37 @@ import User from "../models/User.js";
 
 export const inngest = new Inngest({ id: "movie-ticket-booking-system" });
 const syncUserCreation = inngest.createFunction(
-  { id: 'sync-user-from-clerk' },
-  { event: 'clerk/user.created' },
+  { id: "sync-user-from-clerk" },
+  { event: "clerk/user.created" },
   async ({ event }) => {
     try {
-      console.log("Received event data:", event.data); // 👈 Inspect this in Inngest logs
+      console.log("clerk/user.created event:", event.data);
 
       const { id, first_name, last_name, email_address, image_url } = event.data;
 
+      const email = Array.isArray(email_address) && email_address.length > 0
+        ? email_address[0].email_address
+        : "";
+
+      const name = `${first_name ?? ""} ${last_name ?? ""}`.trim();
+      const image = image_url ?? "";
+
       const userData = {
         _id: id,
-        email: email_address?.[0]?.email_address || "", // Safe fallback
-        name: `${first_name ?? ''} ${last_name ?? ''}`,
-        image: image_url ?? ""
+        email,
+        name,
+        image,
       };
 
       await User.create(userData);
-    } catch (err) {
-      console.error("Failed to create user:", err);
-      throw err; // Let Inngest mark this as failed
+      console.log("✅ User created:", userData);
+    } catch (error) {
+      console.error("❌ Error in syncUserCreation:", error);
+      throw error;
     }
   }
 );
+
 //deleteing the user in the databse 
 const syncUserDeletion=inngest.createFunction(
     {id:'delete-user-from-clerk'},
