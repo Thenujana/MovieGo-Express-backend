@@ -7,16 +7,21 @@ const syncUserCreation = inngest.createFunction(
   { event: "clerk/user.created" },
   async ({ event }) => {
     try {
-      console.log("clerk/user.created event:", event.data);
+      console.log("🟨 clerk/user.created event:", JSON.stringify(event.data, null, 2));
 
       const { id, first_name, last_name, email_address, image_url } = event.data;
 
-      const email = Array.isArray(email_address) && email_address.length > 0
-        ? email_address[0].email_address
-        : "";
+      if (!id || !Array.isArray(email_address) || email_address.length === 0) {
+        throw new Error("Missing required user data: ID or email");
+      }
 
+      const email = email_address[0]?.email_address;
       const name = `${first_name ?? ""} ${last_name ?? ""}`.trim();
-      const image = image_url ?? "";
+      const image = image_url;
+
+      if (!name || !email || !image) {
+        throw new Error("Required fields missing: name, email, or image");
+      }
 
       const userData = {
         _id: id,
@@ -28,11 +33,12 @@ const syncUserCreation = inngest.createFunction(
       await User.create(userData);
       console.log("✅ User created:", userData);
     } catch (error) {
-      console.error("❌ Error in syncUserCreation:", error);
+      console.error("❌ Error in syncUserCreation:", error.message);
       throw error;
     }
   }
 );
+
 
 //deleteing the user in the databse 
 const syncUserDeletion=inngest.createFunction(
