@@ -1,0 +1,12 @@
+import mongoose from "mongoose";
+const showSchema=new mongoose.Schema(
+    {
+        movie:{type: String, required:true, ref: 'Movie'},
+        showDateTime:{type:Date,required:true},
+         showDateTime:{type:Number,required:true},
+          showDateTime:{type:Object,default:{}},
+
+    },{minimize:false}
+)
+const Show=mongoose.model("Show",showSchema);
+export default Show;
