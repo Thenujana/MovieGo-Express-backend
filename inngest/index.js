@@ -7,7 +7,7 @@ const syncUserCreation = inngest.createFunction(
   { event: "clerk/user.created" },
   async ({ event }) => {
     try {
-      console.log("🟨 clerk/user.created event:", JSON.stringify(event.data, null, 2));
+      console.log(" clerk/user.created event:", JSON.stringify(event.data, null, 2));
 
       const { id, first_name, last_name, email_address, image_url } = event.data;
 
@@ -31,9 +31,9 @@ const syncUserCreation = inngest.createFunction(
       };
 
       await User.create(userData);
-      console.log("✅ User created:", userData);
+      console.log(" User created:", userData);
     } catch (error) {
-      console.error("❌ Error in syncUserCreation:", error.message);
+      console.error(" Error in syncUserCreation:", error.message);
       throw error;
     }
   }
